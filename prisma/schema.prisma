@@ -13,3 +13,68 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+/// User of the system
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role      Role     @relation(fields: [roleId], references: [id])
+  sentMails SentMail[]
+}
+
+/// Role (admin, clinician, etc.)
+model Role {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+/// Permission (manage_users, send_email, etc.)
+model Permission {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  roles RolePermission[]
+}
+
+/// Pivot: Role ↔ Permission (many-to-many)
+model RolePermission {
+  id            String      @id @default(uuid())
+  roleId        String
+  permissionId  String
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
+
+/// Sent Mail log (instead of EmailHistory)
+model SentMail {
+  id        String   @id @default(uuid())
+  to        String
+  subject   String
+  body      String
+  status    String   // e.g., "SENT", "FAILED", "QUEUED"
+  sentAt    DateTime @default(now())
+  userId    String
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+
