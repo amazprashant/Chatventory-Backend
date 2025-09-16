@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+//  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -16,23 +16,45 @@ datasource db {
 
 /// User of the system
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  roleId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  first_name      String
+  last_name       String
+  email           String   @unique
+  password        String
+  roleId          String
+  corporate_id    String?
+  user_type       String?
+  profile_picture String?
+  is_delete       Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  created_by_user String?
+  updated_by_user String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   role      Role     @relation(fields: [roleId], references: [id])
   sentMails SentMail[]
+
+  // self-relations
+  createdBy   User?   @relation("UserCreatedBy", fields: [created_by_user], references: [id])
+  updatedBy   User?   @relation("UserUpdatedBy", fields: [updated_by_user], references: [id])
+  createdUsers User[] @relation("UserCreatedBy")
+  updatedUsers User[] @relation("UserUpdatedBy")
+
+  // NEW: opposite sides for Customer and Prospect
+  createdCustomers Customer[] @relation("CustomerCreatedBy")
+  updatedCustomers Customer[] @relation("CustomerUpdatedBy")
+
+  createdProspects Prospect[] @relation("ProspectCreatedBy")
+  updatedProspects Prospect[] @relation("ProspectUpdatedBy")
 }
 
 /// Role (admin, clinician, etc.)
 model Role {
   id          String        @id @default(uuid())
-  name        String        @unique
-  description String?
+  role_name   String        @unique
+  is_delete   Boolean       @default(false)
+  is_active   Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -43,8 +65,14 @@ model Role {
 /// Permission (manage_users, send_email, etc.)
 model Permission {
   id          String        @id @default(uuid())
-  name        String        @unique
-  description String?
+  page_name   String        @unique
+  page_url    String
+  icon        String?
+  sequence    Int?
+  sub_sequence Int?
+  user_type   String?
+  is_delete   Boolean       @default(false)
+  is_active   Boolean       @default(true)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -53,9 +81,9 @@ model Permission {
 
 /// Pivot: Role ↔ Permission (many-to-many)
 model RolePermission {
-  id            String      @id @default(uuid())
-  roleId        String
-  permissionId  String
+  id           String      @id @default(uuid())
+  roleId       String
+  permissionId String
 
   role       Role       @relation(fields: [roleId], references: [id])
   permission Permission @relation(fields: [permissionId], references: [id])
@@ -63,7 +91,26 @@ model RolePermission {
   @@unique([roleId, permissionId])
 }
 
-/// Sent Mail log (instead of EmailHistory)
+// Customer
+model Customer {
+  id              String   @id @default(uuid())
+  first_name      String
+  last_name       String
+  email           String
+  subscription    String?
+  experience      String?
+  traded          String?
+  acknowledgement String?
+  created_by_user String?
+  updated_by_user String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  createdBy User? @relation("CustomerCreatedBy", fields: [created_by_user], references: [id])
+  updatedBy User? @relation("CustomerUpdatedBy", fields: [updated_by_user], references: [id])
+}
+
+/// Sent Mail log
 model SentMail {
   id        String   @id @default(uuid())
   to        String
@@ -76,5 +123,19 @@ model SentMail {
   user User @relation(fields: [userId], references: [id])
 }
 
+/// Prospect
+model Prospect {
+  id              String   @id @default(uuid())
+  first_name      String
+  last_name       String
+  email           String   @unique
+  is_delete       Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  created_by_user String?
+  updated_by_user String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-
+  createdBy User? @relation("ProspectCreatedBy", fields: [created_by_user], references: [id])
+  updatedBy User? @relation("ProspectUpdatedBy", fields: [updated_by_user], references: [id])
+}
