@@ -1,27 +1,41 @@
-import {createUser} from "../services/userService.js";
+import { createUser } from "../services/userService.js";
+import bcrypt from "bcrypt";
 
-export const addUser = async(req, res) =>{
-    try{
-        const {first_name,last_name,email_id,corporate_id,roleId,profile_image,status} = req.body;
+export const addUser = async (req, res) => {
+  try {
+    console.log(req.body);
 
-        if(!first_name || !last_name || !email_id || !corporate_id || !roleId){
-            return res.status(400).json({message: "Missing required fields"});
-        }
+    const {
+      first_name,
+      last_name,
+      email,
+      corporate_id,
+      roleId,
+      profile_image, // from request body
+      password,
+    } = req.body;
 
-        const userData ={
-            first_name,
-            last_name,
-            email_id,
-            corporate_id,
-            roleId,
-            profile_image,
-            status
-        }
-        res.status(201).json({
-            message: "User created successfully",
-            data:userData,
-        });
-    }catch(error){
-        res.status(500).json({message: error.message});
+    if (!first_name || !last_name || !email || !corporate_id || !roleId || !password) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
-}
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await createUser({
+      first_name,
+      last_name,
+      email: email,  
+      password: hashedPassword,
+      corporate_id,
+      roleId,
+      profile_picture: profile_image || null, 
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

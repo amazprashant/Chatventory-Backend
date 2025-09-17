@@ -7,11 +7,11 @@ export const createUser = async(data) => {
             data:{
                 first_name: data.first_name,
                 last_name: data.last_name,
-                email_id: data.email_id,
+                email: data.email,
+                password: data.password,
                 corporate_id: data.corporate_id,
                 roleId: data.roleId,
                 profile_image: data.profile_image,
-                status: data.status || "pending",
             },
         });
         return newUser;
