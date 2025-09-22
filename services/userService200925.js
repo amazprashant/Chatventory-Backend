@@ -21,3 +21,7 @@ export const createUser =async (data) =>{
         throw error;
     }
 }
+
+const fetchUser = async ()=>{
+    const users = await prisma.user
+}
