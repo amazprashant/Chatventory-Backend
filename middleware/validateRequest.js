@@ -1,40 +1,17 @@
-import { body } from "express-validator";
+import { validationResult } from "express-validator";
 
-export const createUserValidation = [
-  body("first_name")
-    .notEmpty()
-    .withMessage("First name is required")
-    .isString()
-    .withMessage("First name must be a string"),
+export const validateRequest = (req, res, next) => {
+  const errors = validationResult(req);
 
-  body("last_name")
-    .notEmpty()
-    .withMessage("Last name is required")
-    .isString()
-    .withMessage("Last name must be a string"),
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      message: "Validation failed",
+      errors: errors.array().map(err => ({
+        field: err.param,
+        message: err.msg,
+      })),
+    });
+  }
 
-  body("email")
-    .notEmpty()
-    .withMessage("Email is required")
-    .isEmail()
-    .withMessage("Email must be valid"),
-
-  body("password")
-    .notEmpty()
-    .withMessage("Password is required")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
-
-  body("corporate_id")
-    .notEmpty()
-    .withMessage("Corporate ID is required"),
-
-  body("roleId")
-    .notEmpty()
-    .withMessage("Role ID is required"),
-
-  body("profile_picture")
-    .optional()
-    .isURL()
-    .withMessage("Profile picture must be a valid URL"),
-];
+  next();
+};

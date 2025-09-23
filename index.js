@@ -1,15 +1,15 @@
-const express = require('express');
-const app = express();
-const pool = require('./db');
-const dotenv = require('dotenv');
-const { user } = require('pg/lib/defaults');
-const userRoutes = require('./routes/userRoutes.js');
+const express = require("express");
+const dotenv = require("dotenv");
+const pool = require("./db");
+const userRoutes = require("./routes/userRoutes.js");
 
-const port = process.env.PORT;
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 5000;
 
 app.use(express.json());
-app.use("/api",userRoutes);
-
+app.use("/api", userRoutes);
 
 app.get("/check-db", async (req, res) => {
   try {
@@ -20,8 +20,6 @@ app.get("/check-db", async (req, res) => {
   }
 });
 
-
-
-app.listen(port, () =>{
-    console.log(`Server is running on http://localhost:${port}`);
-})
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
