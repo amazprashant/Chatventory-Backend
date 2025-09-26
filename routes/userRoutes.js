@@ -3,6 +3,7 @@ const { addUser, fetchAllUser,getUserById,updateUserById } = require("../control
 const { createUserValidation } = require("../validations/userValidation.js");
 const { validateRequest } = require("../middleware/validateRequest.js");
 
+
 const router = express.Router();
 
 router.post("/users", createUserValidation, validateRequest, addUser);
