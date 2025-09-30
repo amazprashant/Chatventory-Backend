@@ -1,10 +1,10 @@
-import { createCustomer, fetchCustomerById, fetchCustomer, updateCustomer,deleteCustomer } from '../services/customerService';
+import { createCustomer, fetchCustomerById, fetchCustomer, updateCustomer,deleteCustomer } from '../services/customerService.js';
 
 export const addCustomer = async(req, res)=>{
     try{
-        const {first_name,last_name,email,subscriptions,experience,traded,acknowledgement  } = req.body;
+        const {first_name,last_name,email,subscription,experience,traded,acknowledgement  } = req.body;
 
-        if(!first_name || !last_name || !email  || !subscriptions || !experience || !traded || !acknowledgement){
+        if(!first_name || !last_name || !email  || !subscription || !experience || !traded || !acknowledgement){
                 return res.status(400).json({message:"All fields are required"});
         }
 
@@ -12,7 +12,7 @@ export const addCustomer = async(req, res)=>{
             first_name,
             last_name,
             email,
-            subscriptions,
+            subscription,
             experience,
             traded,
             acknowledgement 
@@ -24,7 +24,7 @@ export const addCustomer = async(req, res)=>{
     }
 
 }
-export const fetchAllCustomer =async()=>{
+export const fetchAllCustomer =async(req,res)=>{
     try{
         const fetchAll = await fetchCustomer();
         res.status(200).json({data:fetchAll});
@@ -70,5 +70,23 @@ export const updateCustomerById = async(req,res)=>{
         res.status(200).json({message:"Customer updated successfully",data:updateData});
     }catch(error){
         res.status(500).json({message:error.message});
+    }
+}
+
+export const deleteCustomerById = async(req,res)=>{
+    try{
+        const {id} = req.params;
+
+        if(!id){
+            return res.status(400).json({message:"ID parameter is required"});
+        }
+
+        const customer = await deleteCustomer(id);
+        if(!customer){
+            return res.status(404).json({message:"Customer not found"});
+        }
+        res.status(200).json({message:"Customer deleted successfully"});
+    }catch(err){
+        res.status(500).json({message:"Error deleting customer",error:err.message});
     }
 }

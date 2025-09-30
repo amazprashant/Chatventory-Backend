@@ -2,6 +2,9 @@ const express = require("express");
 const dotenv = require("dotenv");
 const pool = require("./db");
 const userRoutes = require("./routes/userRoutes.js");
+const customerRoutes = require("./routes/customerRoutes.js");
+const prospectRoutes = require("./routes/prospectRoutes.js");
+
 
 dotenv.config();
 
@@ -10,6 +13,9 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use("/api", userRoutes);
+app.use("/api", customerRoutes);
+app.use("/api",prospectRoutes);
+
 
 app.get("/check-db", async (req, res) => {
   try {
