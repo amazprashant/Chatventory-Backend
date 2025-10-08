@@ -7,6 +7,6 @@ router.post("/customers",addCustomer);
 router.get("/customers",fetchAllCustomer);
 router.get("/customers/:id",getCustomerById);
 router.put("/customers/:id", updateCustomerById);
-router.put("/customers/:id", deleteCustomerById);
+router.put("/delete/customers/:id", deleteCustomerById);
 
 module.exports = router;

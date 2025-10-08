@@ -2,16 +2,15 @@ import {createProspect,fetchProspectById,fetchProspect,updateProspect} from "../
 
 export const addProspect = async(req, res)=>{
     try{
-        const {first_name,last_name,email,comment} = req.body;
+        const {first_name,last_name,email} = req.body;
 
-        if(!first_name || !last_name || !email || !comment){
+        if(!first_name || !last_name || !email ){
             return res.status(400).json({message:"All fields are required"});
         }
         const newProspect ={
             first_name,
             last_name,
-            email,
-            comment
+            email
         }
         await createProspect(newProspect);
         res.status(201).json({message:"Prospect created successfully"});
@@ -49,15 +48,15 @@ export const getAllProspect = async(req,res)=>{
 export const updateProspectById = async(req,res)=>{
     try{
         const {id} =req.params;
-        const {first_name,last_name,email,comment} = req.body;
+        console.log(id);
+        const {first_name,last_name,email} = req.body;
         if(!id){
             return res.status(400).json({message:"ID parameter is required"});
         }
         const updateData ={
             first_name,
             last_name,
-            email,
-            comment
+            email
         }
         await updateProspect(id,updateData);
         res.status(200).json({message:"Prospect updated successfully"});
